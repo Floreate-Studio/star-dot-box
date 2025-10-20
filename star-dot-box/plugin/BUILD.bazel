@@ -1,0 +1,10 @@
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "plugin",
+    srcs = glob(["*.kt"]),
+    visibility = ["//star-dot-box:__subpackages__"],
+    deps = [
+        "//star-dot-box/plugin/api",
+    ],
+)

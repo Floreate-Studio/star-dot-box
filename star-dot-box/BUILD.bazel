@@ -1,0 +1,22 @@
+load("@rules_java//java:java_binary.bzl", "java_binary")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "star-dot-box_lib",
+    srcs = glob(["*.kt"]),
+    visibility = ["//star-dot-box:__subpackages__"],
+    deps = [
+        "//star-dot-box/plugin",
+        "//star-dot-box/plugin/api",
+    ],
+)
+
+java_binary(
+    name = "star-dot-box",
+    main_class = "voidthinking.star.box.MainKt",
+    visibility = ["//visibility:public"],
+    runtime_deps = [
+        ":star-dot-box_lib",
+        "//text-editor:text-editor_lib",
+    ],
+)

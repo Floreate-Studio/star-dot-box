@@ -1,0 +1,21 @@
+load("@rules_kotlin//kotlin:core.bzl", "define_kt_toolchain", "kt_compiler_plugin")
+
+kt_compiler_plugin(
+    name = "jetpack_compose_compiler_plugin",
+    id = "androidx.compose.compiler.plugins.kotlin",
+    target_embedded_compiler = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:org_jetbrains_kotlin_kotlin_compose_compiler_plugin_embeddable",
+    ],
+)
+
+define_kt_toolchain(
+    name = "kotlin_toolchain",
+    api_version = "2.1",
+    experimental_report_unused_deps = "error",
+    experimental_strict_kotlin_deps = "error",
+    experimental_use_abi_jars = True,
+    jvm_target = "21",
+    language_version = "2.1",
+)
