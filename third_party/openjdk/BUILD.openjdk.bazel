@@ -1,0 +1,9 @@
+load("@rules_pkg//pkg:mappings.bzl", "pkg_files")
+
+pkg_files(
+    name = "files",
+    srcs = glob(["jdk-21.0.8+9-jre/**"]),
+    prefix = "openjdk",
+    strip_prefix = "jdk-21.0.8+9-jre",
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,32 @@
+load("@rules_java//java:java_binary.bzl", "java_binary")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "asset-picker_lib",
+    srcs = ["Main.kt"],
+    plugins = [
+        "//:jetpack_compose_compiler_plugin",
+    ],
+    resource_strip_prefix = "asset-picker/resources",
+    resources = glob(["resources/**"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//star-dot-box/plugin/api",
+        "//asset-picker/ui",
+        "@maven//:org_jetbrains_compose_ui_ui_desktop",
+        "@maven//:org_jetbrains_compose_ui_ui_graphics_desktop",
+    ],
+    runtime_deps = [
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_swing",
+        "@maven//:org_jetbrains_skiko_skiko_awt_runtime_linux_x64",
+        "@maven//:org_jetbrains_skiko_skiko_awt_runtime_windows_x64",
+    ],
+)
+
+java_binary(
+    name = "asset-picker",
+    main_class = "voidthinking.assetpicker.MainKt",
+    runtime_deps = [
+        ":asset-picker_lib",
+    ],
+)

@@ -1,0 +1,11 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+
+rust_binary(
+    name = "launcher",
+    srcs = ["main.rs"],
+    tags = ["clippy"],
+    target_compatible_with = [
+        "@platforms//os:windows",
+    ],
+    visibility = ["//:__pkg__"],
+)

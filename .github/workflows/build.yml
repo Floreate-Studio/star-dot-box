@@ -13,9 +13,9 @@ jobs:
           disk-cache: ${{ github.workflow }}
           repository-cache: true
       - name: build
-        run: bazel build //star-dot-box:star-dot-box_deploy.jar
+        run: bazel build --platforms=//platforms:windows_x86_64 --verbose_failures //:dist_zip
       - name: capture build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-bazel
-          path: bazel-bin/star-dot-box/star-dot-box_deploy.jar
+          name: artifacts
+          path: bazel-bin/dist_zip.zip
