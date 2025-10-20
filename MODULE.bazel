@@ -26,7 +26,6 @@ maven.install(
         "org.jetbrains.skiko:skiko-awt-runtime-linux-x64:0.9.22.2",
         "com.mohamedrejeb.richeditor:richeditor-compose-desktop:1.0.0-rc13",
         "com.github.skydoves:colorpicker-compose-desktop:1.1.2",
-        "com.android.tools:r8:8.11.18",
     ],
     fetch_sources = True,
     lock_file = "//:maven_install.json",
