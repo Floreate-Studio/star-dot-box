@@ -1,0 +1,10 @@
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "service",
+    srcs = glob(["*.kt"]) + glob(["impl/*.kt"]),
+    visibility = ["//asset-picker/backend:__subpackages__"],
+    deps = [
+        "//asset-picker/backend/model",
+    ],
+)

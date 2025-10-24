@@ -1,4 +1,4 @@
-package voidthinking.backend
+package voidthinking.backend.model
 
 import java.nio.file.Path
 

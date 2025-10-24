@@ -1,15 +1,11 @@
-package voidthinking.backend
+package voidthinking.backend.service
 
+import voidthinking.backend.model.Asset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 
-interface EntryBackend {
-    fun scanAssets(directory: Path): List<Asset>
-}
-
-
-private class EntryBackendImpl(val rootDir: Path) : EntryBackend {
+class EntryBackendImpl(val rootDir: Path) : EntryBackend {
     override fun scanAssets(directory: Path): List<Asset> {
         if (!Files.exists(directory) || !Files.isDirectory(directory)) {
             return emptyList()
@@ -34,6 +30,13 @@ private class EntryBackendImpl(val rootDir: Path) : EntryBackend {
             }
             .collect(Collectors.toList())
     }
-}
 
-fun EntryBackend(rootDir: Path): EntryBackend = EntryBackendImpl(rootDir)
+    override fun searchAssets(assets: List<Asset>, query: String): List<Asset> {
+        if (query.isEmpty()) return assets
+
+        return assets.filter { asset ->
+            val fileName = asset.jsonFile.fileName.toString().substringBeforeLast(".")
+            fileName.contains(query, ignoreCase = true)
+        }
+    }
+}

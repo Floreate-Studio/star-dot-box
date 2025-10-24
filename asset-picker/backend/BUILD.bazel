@@ -1,6 +1,8 @@
-load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-
-kt_jvm_library(
+filegroup(
     name = "backend",
-    srcs = glob(["*.kt"]),
+    srcs = [
+         "//asset-picker/backend/model",
+         "//asset-picker/backend/service"
+    ],
+    visibility = ["//asset-picker:__subpackages__"],
 )
