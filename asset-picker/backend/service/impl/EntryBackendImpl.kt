@@ -1,6 +1,8 @@
 package voidthinking.backend.service
 
+import kotlinx.serialization.json.Json
 import voidthinking.backend.model.Asset
+import voidthinking.backend.model.AssetManifest
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
@@ -21,13 +23,17 @@ class EntryBackendImpl(val rootDir: Path) : EntryBackend {
                 val fileNameWithoutExtension = jsonPath.fileName.toString().substringBeforeLast(".")
                 val parentDir = jsonPath.parent
 
+                val jsonString = Files.readString(jsonPath)
+                val manifest = Json.decodeFromString<AssetManifest>(jsonString)
+
                 val supportedImageExtensions = listOf(".png", ".jpg", ".jpeg", ".gif", ".bmp")
                 val previewPath = supportedImageExtensions
                     .map { ext -> parentDir.resolve("$fileNameWithoutExtension$ext") }
                     .find { imagePath -> Files.exists(imagePath) }
 
-                Asset(jsonPath, previewPath)
+                Asset(manifest, jsonPath, previewPath)
             }
+
             .collect(Collectors.toList())
     }
 
@@ -35,7 +41,7 @@ class EntryBackendImpl(val rootDir: Path) : EntryBackend {
         if (query.isEmpty()) return assets
 
         return assets.filter { asset ->
-            val fileName = asset.jsonFile.fileName.toString().substringBeforeLast(".")
+            val fileName = asset.manifestPath.fileName.toString().substringBeforeLast(".")
             fileName.contains(query, ignoreCase = true)
         }
     }

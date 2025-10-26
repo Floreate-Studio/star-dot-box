@@ -6,5 +6,7 @@ kt_jvm_library(
     visibility = ["//asset-picker/backend:__subpackages__"],
     deps = [
         "//asset-picker/backend/model",
+        "//:kotlin_serialization",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_json_jvm"
     ],
 )

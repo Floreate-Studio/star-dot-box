@@ -4,4 +4,7 @@ kt_jvm_library(
     name = "model",
     srcs = glob(["*.kt"]),
     visibility = ["//asset-picker/backend:__subpackages__"],
+    deps = [
+        "//:kotlin_serialization",
+    ],
 )
