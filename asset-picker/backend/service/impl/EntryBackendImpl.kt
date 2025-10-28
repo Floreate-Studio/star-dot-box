@@ -7,38 +7,60 @@ import voidthinking.backend.model.Asset
 import voidthinking.backend.model.AssetManifest
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.stream.Collectors
 
 class EntryBackendImpl(val rootDir: Path) : EntryBackend {
     private var cachedAssets: List<Asset> = emptyList()
-
+    private var lastRootModifiedTime: Long = -1
+    private var fileModifiedTimes: MutableMap<Path, Long> = mutableMapOf()
     override fun scanAssets(directory: Path): List<Asset> {
         if (!Files.exists(directory) || !Files.isDirectory(directory)) {
             return emptyList()
         }
 
-        return Files.walk(directory)
+        val currentRootModifiedTime = Files.getLastModifiedTime(directory).toMillis()
+
+        if (currentRootModifiedTime <= lastRootModifiedTime && cachedAssets.isNotEmpty()) {
+            return cachedAssets
+        }
+
+        val updatedAssets = mutableListOf<Asset>()
+        val updatedFileTimes = mutableMapOf<Path, Long>()
+
+        Files.walk(directory)
             .filter { path ->
                 Files.isRegularFile(path) &&
                         path.toString().endsWith(".json") &&
                         path.parent != null
             }
-            .map { jsonPath ->
-                val fileNameWithoutExtension = jsonPath.fileName.toString().substringBeforeLast(".")
-                val parentDir = jsonPath.parent
+            .forEach { jsonPath ->
+                val fileModifiedTime = Files.getLastModifiedTime(jsonPath).toMillis()
+                updatedFileTimes[jsonPath] = fileModifiedTime
 
-                val jsonString = Files.readString(jsonPath)
-                val manifest = Json.decodeFromString<AssetManifest>(jsonString)
+                val cachedAsset = cachedAssets.find { it.manifestPath == jsonPath }
+                if (cachedAsset != null && fileModifiedTime <= (fileModifiedTimes[jsonPath] ?: 0)) {
+                    updatedAssets.add(cachedAsset)
+                } else {
+                    val fileNameWithoutExtension = jsonPath.fileName.toString().substringBeforeLast(".")
+                    val parentDir = jsonPath.parent
 
-                val supportedImageExtensions = listOf(".png", ".jpg", ".jpeg", ".gif", ".bmp")
-                val previewPath = supportedImageExtensions
-                    .map { ext -> parentDir.resolve("$fileNameWithoutExtension$ext") }
-                    .find { imagePath -> Files.exists(imagePath) }
+                    val jsonString = Files.readString(jsonPath)
+                    val manifest = Json.decodeFromString<AssetManifest>(jsonString)
 
-                Asset(manifest, jsonPath, previewPath)
+                    val supportedImageExtensions = listOf(".png", ".jpg", ".jpeg", ".gif", ".bmp")
+                    val previewPath = supportedImageExtensions
+                        .map { ext -> parentDir.resolve("$fileNameWithoutExtension$ext") }
+                        .find { imagePath -> Files.exists(imagePath) }
+
+                    updatedAssets.add(Asset(manifest, jsonPath, previewPath))
+                }
             }
-            .collect(Collectors.toList())
+
+        lastRootModifiedTime = currentRootModifiedTime
+        fileModifiedTimes = updatedFileTimes
+        return updatedAssets
     }
+
+
 
     override fun searchAssets(assets: List<Asset>, query: String): List<Asset> {
         if (query.isEmpty()) return assets

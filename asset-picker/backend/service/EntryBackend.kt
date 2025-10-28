@@ -8,6 +8,7 @@ interface EntryBackend {
     fun scanAssets(directory: Path): List<Asset>
     fun searchAssets(assets: List<Asset>, query: String): List<Asset>
     fun refreshAssets(scope: CoroutineScope, callback: (List<Asset>) -> Unit)
+
 }
 
 fun EntryBackend(rootDir: Path): EntryBackend = EntryBackendImpl(rootDir)
