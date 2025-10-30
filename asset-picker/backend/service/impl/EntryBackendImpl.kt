@@ -108,6 +108,36 @@ class EntryBackendImpl(val rootDir: Path) : EntryBackend {
         }
     }
 
+    override fun moveAsset(asset: Asset, targetDirectory: Path): Boolean {
+        try {
+            if (!Files.exists(targetDirectory)) {
+                Files.createDirectories(targetDirectory)
+            }
+
+            val newManifestPath = targetDirectory.resolve(asset.manifestPath.fileName)
+            Files.move(asset.manifestPath, newManifestPath)
+
+            asset.previewPath?.let { previewPath ->
+                val newPreviewPath = targetDirectory.resolve(previewPath.fileName)
+                Files.move(previewPath, newPreviewPath)
+            }
+
+            cachedAssets = cachedAssets.map {
+                if (it.manifestPath == asset.manifestPath) {
+                    Asset(it.manifest, newManifestPath, it.previewPath?.let {
+                        targetDirectory.resolve(it.fileName)
+                    })
+                } else {
+                    it
+                }
+            }
+
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+    }
 
     override fun searchAssets(assets: List<Asset>, query: String): List<Asset> {
         if (query.isEmpty()) return assets
